@@ -15,10 +15,12 @@ import {
   InvoiceTable,
   Pagination,
 } from "@/components/dragonfly";
+import { useOfficeContext } from "@/lib/dragonfly/context/OfficeContext";
 
 function InvoicesPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { selectedOfficeId } = useOfficeContext();
 
   // State
   const [invoices, setInvoices] = useState<InvoiceListItem[]>([]);
@@ -45,6 +47,7 @@ function InvoicesPage() {
       if (vendorName) params.vendor_name = vendorName;
       if (dateFrom) params.date_from = dateFrom;
       if (dateTo) params.date_to = dateTo;
+      if (selectedOfficeId) params.office_id = selectedOfficeId; // NEW: filter by office
 
       const result = await mockListInvoices(params);
       setInvoices(result.data);
@@ -54,7 +57,7 @@ function InvoicesPage() {
     } finally {
       setLoading(false);
     }
-  }, [status, vendorName, dateFrom, dateTo, page, limit]);
+  }, [status, vendorName, dateFrom, dateTo, page, limit, selectedOfficeId]);
 
   useEffect(() => {
     fetchInvoices();

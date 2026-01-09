@@ -17,6 +17,8 @@ export const MOCK_USERS: (UserSummary & { password: string })[] = [
     email: "owner@dragonfly.dev",
     role: UserRole.ADMIN,
     password: "password",
+    office_id: "miami-001", // Home office for ADMIN (but must explicitly select)
+    office_name: "Miami",
   },
   {
     id: "user-002",
@@ -24,6 +26,17 @@ export const MOCK_USERS: (UserSummary & { password: string })[] = [
     email: "user@dragonfly.dev",
     role: UserRole.SUBMITTER,
     password: "password",
+    office_id: "georgia-001", // Fixed office for SUBMITTER
+    office_name: "Georgia",
+  },
+  {
+    id: "user-003",
+    name: "Alex Approver",
+    email: "approver@dragonfly.dev",
+    role: UserRole.APPROVER,
+    password: "password",
+    office_id: "orlando-001", // Fixed office for APPROVER
+    office_name: "Orlando",
   },
 ];
 
@@ -51,7 +64,7 @@ export const MOCK_CATEGORIES: Category[] = [
 const submitter = MOCK_USERS[1];
 
 export const MOCK_INVOICES: InvoiceDetail[] = [
-  // DRAFT invoices (4)
+  // DRAFT invoices (4) - distributed across offices
   {
     id: "inv-001",
     vendor_name: "Office Depot",
@@ -70,6 +83,7 @@ export const MOCK_INVOICES: InvoiceDetail[] = [
     submitted_by: submitter,
     created_at: "2025-01-03T10:00:00Z",
     updated_at: "2025-01-03T10:00:00Z",
+    office: { id: "miami-001", name: "Miami" },
   },
   {
     id: "inv-002",
@@ -89,6 +103,7 @@ export const MOCK_INVOICES: InvoiceDetail[] = [
     submitted_by: submitter,
     created_at: "2025-01-05T14:30:00Z",
     updated_at: "2025-01-05T14:30:00Z",
+    office: { id: "orlando-001", name: "Orlando" },
   },
   {
     id: "inv-003",
@@ -108,6 +123,7 @@ export const MOCK_INVOICES: InvoiceDetail[] = [
     submitted_by: submitter,
     created_at: "2025-01-02T09:15:00Z",
     updated_at: "2025-01-02T09:15:00Z",
+    office: { id: "georgia-001", name: "Georgia" },
   },
   {
     id: "inv-004",
@@ -122,6 +138,7 @@ export const MOCK_INVOICES: InvoiceDetail[] = [
     submitted_by: submitter,
     created_at: "2025-01-06T16:00:00Z",
     updated_at: "2025-01-06T16:00:00Z",
+    office: { id: "miami-001", name: "Miami" },
   },
 
   // PENDING_APPROVAL invoices (5)
@@ -144,6 +161,7 @@ export const MOCK_INVOICES: InvoiceDetail[] = [
     submitted_at: "2025-01-04T11:00:00Z",
     created_at: "2024-12-29T08:00:00Z",
     updated_at: "2025-01-04T11:00:00Z",
+    office: { id: "orlando-001", name: "Orlando" },
   },
   {
     id: "inv-006",
@@ -164,6 +182,7 @@ export const MOCK_INVOICES: InvoiceDetail[] = [
     submitted_at: "2025-01-03T09:30:00Z",
     created_at: "2025-01-02T10:00:00Z",
     updated_at: "2025-01-03T09:30:00Z",
+    office: { id: "miami-001", name: "Miami" },
   },
   {
     id: "inv-007",
@@ -184,6 +203,7 @@ export const MOCK_INVOICES: InvoiceDetail[] = [
     submitted_at: "2025-01-02T14:00:00Z",
     created_at: "2025-01-01T10:00:00Z",
     updated_at: "2025-01-02T14:00:00Z",
+    office: { id: "georgia-001", name: "Georgia" },
   },
   {
     id: "inv-008",
@@ -204,6 +224,7 @@ export const MOCK_INVOICES: InvoiceDetail[] = [
     submitted_at: "2025-01-05T10:00:00Z",
     created_at: "2025-01-04T15:00:00Z",
     updated_at: "2025-01-05T10:00:00Z",
+    office: { id: "miami-001", name: "Miami" },
   },
   {
     id: "inv-009",
@@ -224,6 +245,7 @@ export const MOCK_INVOICES: InvoiceDetail[] = [
     submitted_at: "2025-01-02T08:00:00Z",
     created_at: "2025-01-01T09:00:00Z",
     updated_at: "2025-01-02T08:00:00Z",
+    office: { id: "orlando-001", name: "Orlando" },
   },
 
   // APPROVED invoices (4)
@@ -246,6 +268,7 @@ export const MOCK_INVOICES: InvoiceDetail[] = [
     submitted_at: "2024-12-16T10:00:00Z",
     created_at: "2024-12-15T11:00:00Z",
     updated_at: "2024-12-20T14:00:00Z",
+    office: { id: "georgia-001", name: "Georgia" },
   },
   {
     id: "inv-011",
@@ -266,6 +289,7 @@ export const MOCK_INVOICES: InvoiceDetail[] = [
     submitted_at: "2024-12-21T09:00:00Z",
     created_at: "2024-12-20T14:00:00Z",
     updated_at: "2024-12-28T11:00:00Z",
+    office: { id: "miami-001", name: "Miami" },
   },
   {
     id: "inv-012",
@@ -286,6 +310,7 @@ export const MOCK_INVOICES: InvoiceDetail[] = [
     submitted_at: "2024-12-19T11:00:00Z",
     created_at: "2024-12-18T16:00:00Z",
     updated_at: "2024-12-22T10:00:00Z",
+    office: { id: "orlando-001", name: "Orlando" },
   },
   {
     id: "inv-013",
@@ -306,6 +331,7 @@ export const MOCK_INVOICES: InvoiceDetail[] = [
     submitted_at: "2024-12-23T10:00:00Z",
     created_at: "2024-12-22T15:00:00Z",
     updated_at: "2024-12-27T09:00:00Z",
+    office: { id: "miami-001", name: "Miami" },
   },
 
   // REJECTED invoices (2)
@@ -328,6 +354,7 @@ export const MOCK_INVOICES: InvoiceDetail[] = [
     submitted_at: "2024-12-11T14:00:00Z",
     created_at: "2024-12-10T09:00:00Z",
     updated_at: "2024-12-15T16:00:00Z",
+    office: { id: "orlando-001", name: "Orlando" },
   },
   {
     id: "inv-015",
@@ -348,6 +375,7 @@ export const MOCK_INVOICES: InvoiceDetail[] = [
     submitted_at: "2024-12-13T10:00:00Z",
     created_at: "2024-12-12T11:00:00Z",
     updated_at: "2024-12-18T14:00:00Z",
+    office: { id: "georgia-001", name: "Georgia" },
   },
 
   // PAID invoices (3)
@@ -370,6 +398,7 @@ export const MOCK_INVOICES: InvoiceDetail[] = [
     submitted_at: "2024-12-02T08:00:00Z",
     created_at: "2024-12-01T09:00:00Z",
     updated_at: "2024-12-08T15:00:00Z",
+    office: { id: "miami-001", name: "Miami" },
   },
   {
     id: "inv-017",
@@ -390,6 +419,7 @@ export const MOCK_INVOICES: InvoiceDetail[] = [
     submitted_at: "2024-12-02T10:00:00Z",
     created_at: "2024-12-01T11:00:00Z",
     updated_at: "2024-12-15T09:00:00Z",
+    office: { id: "georgia-001", name: "Georgia" },
   },
   {
     id: "inv-018",
@@ -410,5 +440,6 @@ export const MOCK_INVOICES: InvoiceDetail[] = [
     submitted_at: "2024-11-29T14:00:00Z",
     created_at: "2024-11-28T10:00:00Z",
     updated_at: "2024-12-20T11:00:00Z",
+    office: { id: "miami-001", name: "Miami" },
   },
 ];

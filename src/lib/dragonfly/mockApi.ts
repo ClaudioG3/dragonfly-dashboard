@@ -153,15 +153,22 @@ export async function mockListInvoices(
     date_to,
     page = 1,
     limit = 20,
+    office_id, // NEW: office filter
   } = params;
 
   let filtered = [...invoices];
+
+  // Apply office scoping (all roles)
+  // Filter by office_id if provided (typically from selected office)
+  if (office_id) {
+    filtered = filtered.filter((inv) => inv.office.id === office_id);
+  }
 
   // Apply data scoping: SUBMITTER sees only own invoices
   if (session.user.role === UserRole.SUBMITTER) {
     filtered = filtered.filter((inv) => inv.submitted_by.id === session.user.id);
   }
-  // APPROVER and ADMIN see all invoices
+  // APPROVER and ADMIN see all invoices (within selected office)
 
   // Filter by status
   if (status) {
@@ -211,6 +218,7 @@ export async function mockListInvoices(
     submitted_at: inv.submitted_at,
     created_at: inv.created_at,
     version: inv.version,
+    office: inv.office,
   }));
 
   return {
@@ -706,12 +714,31 @@ export async function mockGetCategories(): Promise<Category[]> {
 }
 
 export async function mockCreateInvoiceFromUpload(
-  fileName: string
+  fileName: string,
+  officeId?: string
 ): Promise<InvoiceDetail> {
   await simulatedLatency();
 
   // Require authentication
   const session = requireSession();
+
+  // Determine office for new invoice
+  // Use provided officeId, or fall back to user's office_id
+  const selectedOfficeId = officeId || session.user.office_id;
+  if (!selectedOfficeId) {
+    throw new DragonflyApiError({
+      status: 400,
+      code: "VALIDATION_ERROR",
+      message: "Office must be specified for invoice creation.",
+    });
+  }
+
+  // Get office name (in real app this would be a lookup)
+  // For now, we'll extract from user's office_name or use a simple mapping
+  let officeName = session.user.office_name || "Unknown Office";
+  if (selectedOfficeId === "miami-001") officeName = "Miami";
+  if (selectedOfficeId === "orlando-001") officeName = "Orlando";
+  if (selectedOfficeId === "georgia-001") officeName = "Georgia";
 
   // Generate random extraction confidence
   const extractionConfidence = 0.6 + Math.random() * 0.38; // 0.60-0.98
@@ -731,6 +758,7 @@ export async function mockCreateInvoiceFromUpload(
     submitted_by: session.user,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
+    office: { id: selectedOfficeId, name: officeName },
   };
 
   invoices.push(newInvoice);

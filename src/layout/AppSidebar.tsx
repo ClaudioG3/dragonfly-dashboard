@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useRef, useCallback, useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -31,46 +31,157 @@ type NavItem = {
   icon: React.ReactNode;
   path?: string;
   new?: boolean;
-  subItems?: { name: string; path: string; pro?: boolean; new?: boolean; requiresApprover?: boolean }[];
+  subItems?: {
+    name: string;
+    path: string;
+    pro?: boolean;
+    new?: boolean;
+    requiresApprover?: boolean;
+  }[];
 };
 
+/**
+ * =========================================================
+ * TAILADMIN DEFAULT NAV (DISABLED FOR DRAGONFLY MVP)
+ * ---------------------------------------------------------
+ * Preserved for:
+ * - Phase II expansion
+ * - Admin / analytics modules
+ * - Template reference
+ *
+ * DO NOT DELETE
+ * =========================================================
+ */
+// const navItems: NavItem[] = [
+//   {
+//     icon: <GridIcon />,
+//     name: "Dashboard",
+//     subItems: [
+//       { name: "Ecommerce", path: "/" },
+//       { name: "Analytics", path: "/analytics" },
+//       { name: "Marketing", path: "/marketing" },
+//       { name: "CRM", path: "/crm" },
+//       { name: "Stocks", path: "/stocks" },
+//       { name: "SaaS", path: "/saas", new: true },
+//       { name: "Logistics", path: "/logistics", new: true },
+//     ],
+//   },
+//   {
+//     name: "AI Assistant",
+//     icon: <AiIcon />,
+//     new: true,
+//     subItems: [
+//       {
+//         name: "Text Generator",
+//         path: "/text-generator",
+//       },
+//       {
+//         name: "Image Generator",
+//         path: "/image-generator",
+//       },
+//       {
+//         name: "Code Generator",
+//         path: "/code-generator",
+//       },
+//       {
+//         name: "Video Generator",
+//         path: "/video-generator",
+//       },
+//     ],
+//   },
+//   {
+//     icon: (
+//       <svg
+//         className="w-5 h-5"
+//         fill="none"
+//         stroke="currentColor"
+//         viewBox="0 0 24 24"
+//       >
+//         <path
+//           strokeLinecap="round"
+//           strokeLinejoin="round"
+//           strokeWidth={2}
+//           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+//         />
+//       </svg>
+//     ),
+//     name: "Dragonfly",
+//     new: true,
+//     subItems: [
+//       { name: "Invoices", path: "/dragonfly/invoices" },
+//       { name: "Approvals", path: "/dragonfly/approvals", requiresApprover: true },
+//     ],
+//   },
+//   {
+//     name: "E-commerce",
+//     icon: <CartIcon />,
+//     new: true,
+//     subItems: [
+//       { name: "Products", path: "/products-list" },
+//       { name: "Add Product", path: "/add-product" },
+//       { name: "Billing", path: "/billing" },
+//       { name: "Invoices", path: "/invoices" },
+//       { name: "Single Invoice", path: "/single-invoice" },
+//       { name: "Create Invoice", path: "/create-invoice" },
+//       { name: "Transactions", path: "/transactions" },
+//       { name: "Single Transaction", path: "/single-transaction" },
+//     ],
+//   },
+//   {
+//     icon: <CalenderIcon />,
+//     name: "Calendar",
+//     path: "/calendar",
+//   },
+//   {
+//     icon: <UserCircleIcon />,
+//     name: "User Profile",
+//     path: "/profile",
+//   },
+//   {
+//     name: "Task",
+//     icon: <TaskIcon />,
+//     subItems: [
+//       { name: "List", path: "/task-list", pro: false },
+//       { name: "Kanban", path: "/task-kanban", pro: false },
+//     ],
+//   },
+//   {
+//     name: "Forms",
+//     icon: <ListIcon />,
+//     subItems: [
+//       { name: "Form Elements", path: "/form-elements", pro: false },
+//       { name: "Form Layout", path: "/form-layout", pro: false },
+//     ],
+//   },
+//   {
+//     name: "Tables",
+//     icon: <TableIcon />,
+//     subItems: [
+//       { name: "Basic Tables", path: "/basic-tables", pro: false },
+//       { name: "Data Tables", path: "/data-tables", pro: false },
+//     ],
+//   },
+//   {
+//     name: "Pages",
+//     icon: <PageIcon />,
+//     subItems: [
+//       { name: "File Manager", path: "/file-manager" },
+//       { name: "Pricing Tables", path: "/pricing-tables" },
+//       { name: "FAQ", path: "/faq" },
+//       { name: "API Keys", path: "/api-keys", new: true },
+//       { name: "Integrations", path: "/integrations", new: true },
+//       { name: "Blank Page", path: "/blank" },
+//       { name: "404 Error", path: "/error-404" },
+//       { name: "500 Error", path: "/error-500" },
+//       { name: "503 Error", path: "/error-503" },
+//       { name: "Coming Soon", path: "/coming-soon" },
+//       { name: "Maintenance", path: "/maintenance" },
+//       { name: "Success", path: "/success" },
+//     ],
+//   },
+// ];
+
 const navItems: NavItem[] = [
-  {
-    icon: <GridIcon />,
-    name: "Dashboard",
-    subItems: [
-      { name: "Ecommerce", path: "/" },
-      { name: "Analytics", path: "/analytics" },
-      { name: "Marketing", path: "/marketing" },
-      { name: "CRM", path: "/crm" },
-      { name: "Stocks", path: "/stocks" },
-      { name: "SaaS", path: "/saas", new: true },
-      { name: "Logistics", path: "/logistics", new: true },
-    ],
-  },
-  {
-    name: "AI Assistant",
-    icon: <AiIcon />,
-    new: true,
-    subItems: [
-      {
-        name: "Text Generator",
-        path: "/text-generator",
-      },
-      {
-        name: "Image Generator",
-        path: "/image-generator",
-      },
-      {
-        name: "Code Generator",
-        path: "/code-generator",
-      },
-      {
-        name: "Video Generator",
-        path: "/video-generator",
-      },
-    ],
-  },
   {
     icon: (
       <svg
@@ -88,77 +199,14 @@ const navItems: NavItem[] = [
       </svg>
     ),
     name: "Dragonfly",
-    new: true,
     subItems: [
       { name: "Invoices", path: "/dragonfly/invoices" },
-      { name: "Approvals", path: "/dragonfly/approvals", requiresApprover: true },
-    ],
-  },
-  {
-    name: "E-commerce",
-    icon: <CartIcon />,
-    new: true,
-    subItems: [
-      { name: "Products", path: "/products-list" },
-      { name: "Add Product", path: "/add-product" },
-      { name: "Billing", path: "/billing" },
-      { name: "Invoices", path: "/invoices" },
-      { name: "Single Invoice", path: "/single-invoice" },
-      { name: "Create Invoice", path: "/create-invoice" },
-      { name: "Transactions", path: "/transactions" },
-      { name: "Single Transaction", path: "/single-transaction" },
-    ],
-  },
-  {
-    icon: <CalenderIcon />,
-    name: "Calendar",
-    path: "/calendar",
-  },
-  {
-    icon: <UserCircleIcon />,
-    name: "User Profile",
-    path: "/profile",
-  },
-  {
-    name: "Task",
-    icon: <TaskIcon />,
-    subItems: [
-      { name: "List", path: "/task-list", pro: false },
-      { name: "Kanban", path: "/task-kanban", pro: false },
-    ],
-  },
-  {
-    name: "Forms",
-    icon: <ListIcon />,
-    subItems: [
-      { name: "Form Elements", path: "/form-elements", pro: false },
-      { name: "Form Layout", path: "/form-layout", pro: false },
-    ],
-  },
-  {
-    name: "Tables",
-    icon: <TableIcon />,
-    subItems: [
-      { name: "Basic Tables", path: "/basic-tables", pro: false },
-      { name: "Data Tables", path: "/data-tables", pro: false },
-    ],
-  },
-  {
-    name: "Pages",
-    icon: <PageIcon />,
-    subItems: [
-      { name: "File Manager", path: "/file-manager" },
-      { name: "Pricing Tables", path: "/pricing-tables" },
-      { name: "FAQ", path: "/faq" },
-      { name: "API Keys", path: "/api-keys", new: true },
-      { name: "Integrations", path: "/integrations", new: true },
-      { name: "Blank Page", path: "/blank" },
-      { name: "404 Error", path: "/error-404" },
-      { name: "500 Error", path: "/error-500" },
-      { name: "503 Error", path: "/error-503" },
-      { name: "Coming Soon", path: "/coming-soon" },
-      { name: "Maintenance", path: "/maintenance" },
-      { name: "Success", path: "/success" },
+      { name: "New Invoice", path: "/dragonfly/invoices/upload" },
+      {
+        name: "Approvals",
+        path: "/dragonfly/approvals",
+        requiresApprover: true,
+      },
     ],
   },
 ];
@@ -244,7 +292,15 @@ const supportItems: NavItem[] = [
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
-  const { isApprover } = useDragonflySession();
+  const { isApprover, user, loading } = useDragonflySession();
+
+  // Debug: Log approver status
+  console.log('[AppSidebar] Session:', {
+    isApprover,
+    userRole: user?.role,
+    userName: user?.name,
+    loading
+  });
 
   const renderMenuItems = (
     navItems: NavItem[],
@@ -339,7 +395,19 @@ const AppSidebar: React.FC = () => {
             >
               <ul className="mt-2 space-y-1 ml-9">
                 {nav.subItems
-                  .filter((subItem) => !subItem.requiresApprover || isApprover)
+                  .filter((subItem) => {
+                    // Don't filter while session is loading - show all items
+                    if (loading) return true;
+
+                    const shouldShow = !subItem.requiresApprover || isApprover;
+                    console.log(`[AppSidebar] Filter ${subItem.name}:`, {
+                      requiresApprover: subItem.requiresApprover,
+                      isApprover,
+                      shouldShow,
+                      loading
+                    });
+                    return shouldShow;
+                  })
                   .map((subItem) => (
                     <li key={subItem.name}>
                       <Link
@@ -386,7 +454,7 @@ const AppSidebar: React.FC = () => {
     </ul>
   );
 
-  const [openSubmenu, setOpenSubmenu] = useState<{
+  const [manualOpenSubmenu, setManualOpenSubmenu] = useState<{
     type: "main" | "support" | "others";
     index: number;
   } | null>(null);
@@ -399,9 +467,13 @@ const AppSidebar: React.FC = () => {
 
   const isActive = useCallback((path: string) => path === pathname, [pathname]);
 
-  useEffect(() => {
-    // Check if the current path matches any submenu item
-    let submenuMatched = false;
+  // Derive which submenu should be open based on the current pathname
+  const activeSubmenu = useMemo(() => {
+    let matchedSubmenu: {
+      type: "main" | "support" | "others";
+      index: number;
+    } | null = null;
+
     ["main", "support", "others"].forEach((menuType) => {
       const items =
         menuType === "main"
@@ -412,23 +484,22 @@ const AppSidebar: React.FC = () => {
       items.forEach((nav, index) => {
         if (nav.subItems) {
           nav.subItems.forEach((subItem) => {
-            if (isActive(subItem.path)) {
-              setOpenSubmenu({
+            if (subItem.path === pathname) {
+              matchedSubmenu = {
                 type: menuType as "main" | "support" | "others",
                 index,
-              });
-              submenuMatched = true;
+              };
             }
           });
         }
       });
     });
 
-    // If no submenu item matches, close the open submenu
-    if (!submenuMatched) {
-      setOpenSubmenu(null);
-    }
-  }, [pathname, isActive]);
+    return matchedSubmenu;
+  }, [pathname]);
+
+  // Use activeSubmenu if path matches, otherwise use manualOpenSubmenu
+  const openSubmenu = activeSubmenu || manualOpenSubmenu;
 
   useEffect(() => {
     // Set the height of the submenu items when the submenu is opened
@@ -447,7 +518,10 @@ const AppSidebar: React.FC = () => {
     index: number,
     menuType: "main" | "support" | "others"
   ) => {
-    setOpenSubmenu((prevOpenSubmenu) => {
+    setManualOpenSubmenu((prevOpenSubmenu: {
+      type: "main" | "support" | "others";
+      index: number;
+    } | null) => {
       if (
         prevOpenSubmenu &&
         prevOpenSubmenu.type === menuType &&
@@ -526,41 +600,48 @@ const AppSidebar: React.FC = () => {
               </h2>
               {renderMenuItems(navItems, "main")}
             </div>
-            <div>
-              <h2
-                className={`mb-4 text-xs uppercase flex leading-5 text-gray-400 ${
-                  !isExpanded && !isHovered
-                    ? "xl:justify-center"
-                    : "justify-start"
-                }`}
-              >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  "Support"
-                ) : (
-                  <HorizontaLDots />
-                )}
-              </h2>
-              {renderMenuItems(supportItems, "support")}
-            </div>
-            <div>
-              <h2
-                className={`mb-4 text-xs uppercase flex leading-5 text-gray-400 ${
-                  !isExpanded && !isHovered
-                    ? "xl:justify-center"
-                    : "justify-start"
-                }`}
-              >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  "Others"
-                ) : (
-                  <HorizontaLDots />
-                )}
-              </h2>
-              {renderMenuItems(othersItems, "others")}
-            </div>
+            {false && (
+              <div>
+                <h2
+                  className={`mb-4 text-xs uppercase flex leading-5 text-gray-400 ${
+                    !isExpanded && !isHovered
+                      ? "xl:justify-center"
+                      : "justify-start"
+                  }`}
+                >
+                  {isExpanded || isHovered || isMobileOpen ? (
+                    "Support"
+                  ) : (
+                    <HorizontaLDots />
+                  )}
+                </h2>
+                {renderMenuItems(supportItems, "support")}
+              </div>
+            )}
+
+            {false && (
+              <div>
+                <h2
+                  className={`mb-4 text-xs uppercase flex leading-5 text-gray-400 ${
+                    !isExpanded && !isHovered
+                      ? "xl:justify-center"
+                      : "justify-start"
+                  }`}
+                >
+                  {isExpanded || isHovered || isMobileOpen ? (
+                    "Others"
+                  ) : (
+                    <HorizontaLDots />
+                  )}
+                </h2>
+                {renderMenuItems(othersItems, "others")}
+              </div>
+            )}
           </div>
         </nav>
-        {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
+        {false && (isExpanded || isHovered || isMobileOpen) && (
+          <SidebarWidget />
+        )}
       </div>
     </aside>
   );

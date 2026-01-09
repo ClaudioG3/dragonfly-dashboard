@@ -35,11 +35,21 @@ export type ApprovalAction = (typeof ApprovalAction)[keyof typeof ApprovalAction
 // CORE TYPES
 // ============================================
 
+export interface OfficeDTO {
+  id: string;
+  name: string;
+  code?: string;
+  is_active: boolean;
+}
+
 export interface UserSummary {
   id: string;
   name: string;
   email: string;
   role: UserRole;
+  // Office assignment fields
+  office_id?: string; // For SUBMITTER/APPROVER: their assigned office; For ADMIN: home office
+  office_name?: string;
 }
 
 export interface Category {
@@ -72,6 +82,7 @@ export interface InvoiceListItem {
   submitted_at?: string;
   created_at: string;
   version: number;
+  office: { id: string; name: string };
 }
 
 export interface InvoiceDetail {
@@ -94,6 +105,9 @@ export interface InvoiceDetail {
   submitted_at?: string;
   created_at: string;
   updated_at: string;
+  // Office scoping
+  office: { id: string; name: string };
+  department?: { id: string; name: string }; // Optional for future use
   // Rejection details (populated when status is REJECTED)
   rejection_comment?: string;
   rejected_by?: UserSummary;
@@ -143,6 +157,7 @@ export interface PaginatedResponse<T> {
 
 export interface InvoiceListParams {
   status?: InvoiceStatus;
+  office_id?: string; // NEW: filter by office
   vendor_name?: string;
   date_from?: string;
   date_to?: string;

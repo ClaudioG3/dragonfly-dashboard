@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import { withAuth } from "@/lib/dragonfly/auth";
 import { mockCreateInvoiceFromUpload } from "@/lib/dragonfly/mockApi";
 import { UploadDropzone } from "@/components/dragonfly";
+import { useOfficeContext } from "@/lib/dragonfly/context/OfficeContext";
 
 function UploadPage() {
   const router = useRouter();
+  const { selectedOfficeId } = useOfficeContext();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -37,8 +39,11 @@ function UploadPage() {
         });
       }, 200);
 
-      // Create invoice via mock API
-      const invoice = await mockCreateInvoiceFromUpload(selectedFile.name);
+      // Create invoice via mock API (with current office)
+      const invoice = await mockCreateInvoiceFromUpload(
+        selectedFile.name,
+        selectedOfficeId || undefined
+      );
 
       clearInterval(progressInterval);
       setProgress(100);

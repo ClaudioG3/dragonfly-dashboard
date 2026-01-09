@@ -23,10 +23,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useOfficeContext } from "@/lib/dragonfly/context/OfficeContext";
 
 function ApprovalsPage() {
   const router = useRouter();
   const { isApprover, user } = useDragonflySession();
+  const { selectedOfficeId } = useOfficeContext();
 
   const [invoices, setInvoices] = useState<InvoiceListItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,7 +48,7 @@ function ApprovalsPage() {
     if (isApprover) {
       loadPendingInvoices();
     }
-  }, [isApprover]);
+  }, [isApprover, selectedOfficeId]);
 
   const loadPendingInvoices = async () => {
     setLoading(true);
@@ -54,6 +56,7 @@ function ApprovalsPage() {
       const result = await mockListInvoices({
         status: InvoiceStatus.PENDING_APPROVAL,
         limit: 100,
+        office_id: selectedOfficeId || undefined, // NEW: filter by office
       });
       setInvoices(result.data);
     } catch (err) {
